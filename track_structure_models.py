@@ -7,56 +7,53 @@ import matplotlib.pyplot as plt
 # name: list = ['']
 # suc = libam.AT_RDD_name_from_number(1, name)
 
-RDD_name_dic = {1: "Simple step test function",
-                2: "Katz",  # "Katz' point target RDD",
-                3: "Geiss",  # "Geiss' RDD [Geiss et al., 1998]",
-                4: "Site",  # "Site RDD, as defined in [Edmund et al., 2007]",
-                5: "Cucinotta",  # "Cucinotta, as defined in [Cucinotta et al. 1997]",
-                6: "Katz Extended",  # "Katz Extended Target",
-                7: "Cucinotta Extended",  # "Cucinotta Extended Target",
-                8: "Radical Diffusion [Andrea Mairani]",
-                }
 
 
-material_name = 'Water, Liquid'
+# material_name = 'Water, Liquid'
 material_name = 'Aluminum Oxide'
-er_model = 4
+material_no = libam.AT_material_number_from_name(material_name)
+
+er_model = 6
+er_model_name = libam.AT_ERModels(er_model)
 
 particle_no = libam.AT_particle_no_from_Z_and_A_single(6, 12)
-
 particle_name = ['']
 libam.AT_particle_name_from_particle_no_single(particle_no, particle_name)
 
-material_no = libam.AT_material_number_from_name(material_name)
+E_MeV_u = 10
 
 # fix these
-rdd_parameter = [1e-9, 0, 0]
-stopping_power_source_no = 0
+a0 = 1
+rdd_parameter = [a0 * 1e-9, 0, 0]
 
+stopping_power_source_no = libam.stoppingPowerSource_no["PSTAR"].value
+
+RDD_models = [s.name for s in libam.RDDModels]
 
 fig, ax = plt.subplots()
-r_m = list(10**np.linspace(np.log10(1e-11), np.log(0.1), 100))
+r_m = list(10**np.linspace(np.log10(1e-11), np.log(1e-3), 100))
 
 D_RDD_Gy = len(r_m)*[0]
-for E_MeV_u in [10, 250]:
-    for rdd_model_no in [3, 5]:
-        
-        er_model_name = libam.AT_ERModels(er_model)
-        rdd_model_name = RDD_name_dic[rdd_model_no]
 
-        libam.AT_D_RDD_Gy(r_m,
-                          E_MeV_u,
-                          particle_no,
-                          material_no,
-                          rdd_model_no,
-                          rdd_parameter,
-                          er_model,
-                          stopping_power_source_no,
-                          D_RDD_Gy)
+for RDD_name in RDD_models:
+    
+    rdd_model_no = libam.RDDModels[RDD_name].value
 
-        label = "{} MeV/u, {}".format(E_MeV_u, rdd_model_name)
-        ax.plot(r_m, D_RDD_Gy, label=label)
+    libam.AT_D_RDD_Gy(r_m,
+                      E_MeV_u,
+                      particle_no,
+                      material_no,
+                      rdd_model_no,
+                      rdd_parameter,
+                      er_model,
+                      stopping_power_source_no,
+                      D_RDD_Gy)
 
+    label = "{} MeV/u in {} using {}".format(E_MeV_u, material_name, RDD_name)
+    label = "{}".format(RDD_name)
+    ax.plot(r_m, D_RDD_Gy, label=label)
+
+ax.set_ylim(ymin=0.1)
 ax.legend()
 ax.set_title("{} using '{}'".format(particle_name[0], er_model_name.name))
 ax.set_xlabel("Radius (m)")
