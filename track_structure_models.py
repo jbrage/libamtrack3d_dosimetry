@@ -39,9 +39,6 @@ libam.AT_particle_name_from_particle_no_single(particle_no, particle_name)
 # get the stopping power
 stopping_power_source_no = libam.stoppingPowerSource_no["PSTAR"].value
 
-# list of RDD models
-# RDD_models = [s.name for s in libam.RDDModels]
-
 # prepare plot
 fig, ax = plt.subplots()
 r_m = list(10**np.linspace(np.log10(1e-10), np.log(1e-1), 1000))
@@ -56,11 +53,11 @@ for RDD_model in libam.RDDModels:
     # test = [0, 0, 0]
     # print(libam.AT_RDD_a0_m(1e-7, rdd_model_no, test))
     
-    # create a list of the right length
+    # create a list of the right length (probably not necessary?)
     n_rdd_parameters = libam.AT_RDD_number_of_parameters(rdd_model_no)
     rdd_parameter = [0] * n_rdd_parameters
     if rdd_parameter:
-        rdd_parameter[0] = a0_m
+        rdd_parameter[0] = a0_m # is this correct at all?
 
     libam.AT_D_RDD_Gy(r_m,
                       E_MeV_u,
