@@ -19,7 +19,6 @@ Problems:
   so how I get a0 for a given RDD model?
   
 * How do I determine which ER model is suitable for the given RDD?
-
 """
 
 # these should be corrected:
